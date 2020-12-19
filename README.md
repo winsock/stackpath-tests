@@ -2,7 +2,7 @@
 
 Hey there! Do you want to build the next generation of edge services? Do you 
 want to work on cutting-edge technology with a great team full of talented and 
-motivated individuals? StackPath is [hiring backend developers](https://stackpath.applytojob.com/apply/6jLPOngQ5N/Software-Engineer-Golang)! 
+motivated individuals? StackPath is [hiring backend developers](https://stackpath.applytojob.com/apply/)! 
 StackPath's backend powers not just our [customer portal](https://control.stackpath.com) 
 and [API](https://developer.stackpath.com/) but is the core behind many of our 
 amazing products. 
@@ -10,17 +10,14 @@ amazing products.
 We love [golang](https://golang.org/) at StackPath. Most of our services are 
 written in go, and we are always looking to add bright and awesome people to our 
 ranks. If you think this sounds great and if you have what it takes then 
-[apply](https://stackpath.applytojob.com/apply/6jLPOngQ5N/Software-Engineer-Golang) 
-for one of our backend service positions. If being a backend engineer isn't your 
-thing then we have [many open positions](https://stackpath.applytojob.com/) to go 
-for.
+apply for one of our backend service positions. If being a backend engineer isn't your 
+thing then we have [many open positions](https://stackpath.applytojob.com/) to go for.
 
 We employ a lot of modern technology and processes at StackPath. These three 
 exercises are intended to demonstrate your basic knowledge of go and its 
-applications. Pick whichever ones you'd like to solve and give it your best 
-shot. These problems have many solutions. Our managers are most interested in 
+applications. These problems have many solutions. Our managers are most interested in 
 how you choose to solve them and why. There are no wrong answers, as long as 
-these examples compile and work in at least go 1.10 and use [`dep`](https://github.com/golang/dep) 
+these examples compile and work in at least go 1.14 and use [go modules](https://golang.org/ref/mod)
 for package management.
 
 ## Unit Testing
@@ -62,12 +59,12 @@ FizzBuzz
 Done
 ```
 
-It works well enough, but doesn't have any unit tests. Without tests we can't 
+It works well enough, but doesn't have any unit tests. Without tests, we can't 
 prove to everyone that the code works and that it doesn't affect other services. 
 
-Look in the `unit-testing/pkg/fizzbuzz_test.go` file and implement unit tests 
-that flex the `FizzBuzz()` function in `unit-testing/pkg/fizzbuzz.go`. Think of 
-the different kinds of inputs that can be passed to the function and how it 
+Look in the `unit-testing/pkg/fizzbuzz/fizzbuzz_test.go` file and implement unit 
+tests that flex the `FizzBuzz()` function in `unit-testing/pkg/fizzbuzz.go`. Think 
+of the different kinds of inputs that can be passed to the function and how it 
 should act when common and edge cases are used against it. Did your tests find 
 any bugs in `FizzBuzz()`? If so then fix 'em up! Can you get greater than 80% 
 code coverage with your tests? 
@@ -100,6 +97,10 @@ or router if you like. The `Person` model and all of the backend code is in the
 `rest-service/main.go`, and should run by running `go run main.go` from the 
 `rest-service` directory.
 
+Implementing the service is a good start, but are there any extras you can throw 
+in? How would you test this service? How would you audit it? How would an ops 
+person audit it?
+
 ## Input Processing
 
 StackPath operates a gigantic worldwide network to power our edge services. These 
@@ -107,13 +108,15 @@ nodes are in constant communication with each other and various central systems.
 Our services have to be robust enough to handle this communication at scale.
 
 The third programming test in the `input-processing` directory contains a 
-program that takes STDIN as a named pipe and should output every line that 
-contains the word "error" to STDOUT. We've taken care of most of the boilerplate, 
-but the rest is up to you. 
+program that reads STDIN and should output every line that contains the word "error" 
+to STDOUT. We've taken care of most of the boilerplate, but the rest is up to you. 
 
 Consider scale when implementing this. How well will this work if a line is 
 hundreds of megabytes long? What if 10 gigabytes of information is passed to it? 
-What if entries are streamed to it? Assume that `\n` ends a line of input.
+What if entries are streamed to it? How would you differentiate between errors read 
+from the stream vs program errors? How would you test this? Assume that `\n` ends a 
+line of input. Was with the REST service test you're free to use any built-ins or 
+import any frameworks you like to do this.
 
 ## Contributing
 
