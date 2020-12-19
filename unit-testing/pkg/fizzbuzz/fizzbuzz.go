@@ -1,6 +1,8 @@
 package fizzbuzz
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // FizzBuzz performs a FizzBuzz operation over a range of integers
 //
