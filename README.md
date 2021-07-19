@@ -118,6 +118,18 @@ from the stream vs program errors? How would you test this? Assume that `\n` end
 line of input. Was with the REST service test you're free to use any built-ins or 
 import any frameworks you like to do this.
 
+## Concurrency
+
+In some advanced situations, StackPath relies on Go's concurrency primitives to
+perform asynchronous tasks. The `concurrency` directory contains two interfaces for
+asynchronous task pools. Please write implementations that satisfy the two
+interfaces.
+
+While third party libraries can assist, many times our unique needs rely on channels
+directly, so please refrain from using anything but the Go standard library for this
+exercise. Unit tests are not necessary, but feel free to write them if it helps
+during the development.
+
 ## Contributing
 
 What did you think of these? Are these too easy? Too hard? We're open to change 
