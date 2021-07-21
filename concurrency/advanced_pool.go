@@ -1,27 +1,9 @@
-// Package concurrency implements worker pool interfaces, one simple and one a
-// bit more complex.
 package concurrency
 
 import (
 	"context"
 	"errors"
 )
-
-// SimplePool is a simple worker pool that does not support cancellation or
-// closing. All functions are safe to call from multiple goroutines.
-type SimplePool interface {
-	// Submit a task to be executed asynchronously. This function will return as
-	// soon as the task is submitted. If the pool does not have an available slot
-	// for the task, this blocks until it can submit.
-	Submit(func())
-}
-
-// NewSimplePool creates a new SimplePool that only allows the given maximum
-// concurrent tasks to run at any one time. maxConcurrent must be greater than
-// zero.
-func NewSimplePool(maxConcurrent int) SimplePool {
-	panic("TODO")
-}
 
 // ErrPoolClosed is returned from AdvancedPool.Submit when the pool is closed
 // before submission can be sent.
@@ -35,7 +17,7 @@ type AdvancedPool interface {
 	// available or the context is closed. The given context and its lifetime only
 	// affects this function and is not the context passed to the callback. If the
 	// context is closed before a slot becomes available, the context error is
-	// returned. If the pool is closed before a slow becomes available,
+	// returned. If the pool is closed before a slot becomes available,
 	// ErrPoolClosed is returned. Otherwise the task is submitted to the pool and
 	// no error is returned. The context passed to the callback will be closed
 	// when the pool is closed.

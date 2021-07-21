@@ -122,8 +122,10 @@ import any frameworks you like to do this.
 
 In some advanced situations, StackPath relies on Go's concurrency primitives to
 perform asynchronous tasks. The `concurrency` directory contains two interfaces for
-asynchronous task pools. Please write implementations that satisfy the two
-interfaces.
+asynchronous task pools, `SimplePool` and `AdvancedPool`, whose implementation
+requirements are documented on the interface. Please write an implementation for
+`NewSimplePool`. As an extra bonus challenge, but by no means required or necessary,
+feel free to also write an implementation for `NewAdvancedPool`.
 
 While third party libraries can assist, many times our unique needs rely on channels
 directly, so please refrain from using anything but the Go standard library for this
