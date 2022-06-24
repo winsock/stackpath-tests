@@ -1,58 +1,47 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"os"
-	"strconv"
-
 	"github.com/stackpath/backend-developer-tests/unit-testing/pkg/fizzbuzz"
+)
+
+var (
+	// The default argument values and will contain the real values after calling `flag.Parse`
+	startValue = int64(1)
+	endValue   = int64(20)
+	fizzAt     = int64(3)
+	buzzAt     = int64(5)
 )
 
 func main() {
 	fmt.Println("SP// Backend Developer Test - FizzBuzz")
 	fmt.Println()
 
-	// Set default argument values
-	totalArgument := "20"
-	fizzAtArgument := "3"
-	buzzAtArgument := "5"
+	flag.Parse()
 
-	// Pull custom argument values from the command line
-	if len(os.Args) > 1 {
-		totalArgument = os.Args[1]
-	}
-
-	if len(os.Args) > 2 {
-		fizzAtArgument = os.Args[2]
-	}
-
-	if len(os.Args) > 3 {
-		buzzAtArgument = os.Args[3]
-	}
-
-	// Convert argument values to numbers
-	total, err := strconv.ParseInt(totalArgument, 10, 32)
+	// FizzBuzz the input
+	fmt.Println(fmt.Sprintf("FizzBuzzing from %d to %d, fizzing at %d and buzzing at %d:", startValue, endValue, fizzAt, buzzAt))
+	results, err := fizzbuzz.FizzBuzz(startValue, endValue, fizzAt, buzzAt)
 	if err != nil {
-		panic("The number of items to FizzBuzz should be an integer")
+		fmt.Printf("Error: %s\n", err.Error())
+		return
 	}
 
-	fizzAt, err := strconv.ParseInt(fizzAtArgument, 10, 32)
-	if err != nil {
-		panic("The number to Fizz at should be an integer")
-	}
-
-	buzzAt, err := strconv.ParseInt(buzzAtArgument, 10, 32)
-	if err != nil {
-		panic("The number to Buzz at should be an integer")
-	}
-
-	// FizzBuzz the input and print the results
-	fmt.Println(fmt.Sprintf("FizzBuzzing %d number(s), fizzing at %d and buzzing at %d:", total, fizzAt, buzzAt))
-	for _, result := range fizzbuzz.FizzBuzz(total, fizzAt, buzzAt) {
+	// Print the results
+	for _, result := range results {
 		fmt.Println(result)
 	}
 
 	fmt.Println()
 	fmt.Println("Done")
 	fmt.Println()
+}
+
+func init() {
+	// Configure the flags for this FizzBuzz application
+	flag.Int64Var(&startValue, "start", startValue, "What number to start FizzBuzzing at, must be less than the end")
+	flag.Int64Var(&endValue, "end", endValue, "What number to end FizzBuzzing at, must be greater than the start")
+	flag.Int64Var(&fizzAt, "fizz", fizzAt, "The divisor to determine when to Fizz")
+	flag.Int64Var(&buzzAt, "buzz", buzzAt, "The divisor to determine when to Buzz")
 }

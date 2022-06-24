@@ -1,6 +1,7 @@
 package fizzbuzz
 
 import (
+	"errors"
 	"strconv"
 )
 
@@ -18,28 +19,33 @@ const (
 //   `buzzAt` values.
 // - Return the original number if it is not divisible by either the `fizzAt` or
 //   the `buzzAt` values.
-func FizzBuzz(total, fizzAt, buzzAt int64) []string {
-	result := make([]string, total)
+func FizzBuzz(start, end, fizzAt, buzzAt int64) ([]string, error) {
+	if start > end {
+		return make([]string, 0), errors.New("start cannot be after the end")
+	}
 
-	for i := int64(1); i <= total; i++ {
-		isFizz := numberDivisibleBy(i, fizzAt)
-		isBuzz := numberDivisibleBy(i, buzzAt)
+	total := end - start + 1
+	result := make([]string, total)
+	for i := int64(0); i < total; i++ {
+		number := start + i
+		isFizz := numberDivisibleBy(number, fizzAt)
+		isBuzz := numberDivisibleBy(number, buzzAt)
 
 		if !isFizz && !isBuzz {
-			result[i-1] = strconv.FormatInt(i, 10)
+			result[i] = strconv.FormatInt(number, 10)
 			continue
 		}
 
 		if isFizz {
-			result[i-1] = Fizz
+			result[i] = Fizz
 		}
 
 		if isBuzz {
-			result[i-1] += Buzz
+			result[i] += Buzz
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 // numberDivisibleBy returns true if the number i is divisible by the provided divisor
