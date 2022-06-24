@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -92,14 +91,4 @@ func FindPeopleByPhoneNumber(phoneNumber string) []*Person {
 	}
 
 	return result
-}
-
-// ToJSON represents a person as a JSON string.
-func (person *Person) ToJSON() (string, error) {
-	marshaled, err := json.Marshal(person)
-	if err != nil {
-		return "", err
-	}
-
-	return string(marshaled[:]), nil
 }
