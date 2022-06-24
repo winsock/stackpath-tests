@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/stackpath/backend-developer-tests/unit-testing/pkg/fizzbuzz"
+	"os"
 )
 
 var (
@@ -26,7 +27,7 @@ func main() {
 	results, err := fizzbuzz.FizzBuzz(startValue, endValue, fizzAt, buzzAt)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
-		return
+		os.Exit(1)
 	}
 
 	// Print the results
