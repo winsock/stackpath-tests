@@ -18,6 +18,7 @@ func main() {
 	fmt.Println("SP// Backend Developer Test - FizzBuzz")
 	fmt.Println()
 
+	// Read the provided flags
 	flag.Parse()
 
 	// FizzBuzz the input
