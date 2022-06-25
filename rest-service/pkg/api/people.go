@@ -25,10 +25,12 @@ func (api *API) SearchPeople(w http.ResponseWriter, r *http.Request, _ httproute
 		return
 	}
 
+	/* Requirement docs do not want a 404 here, but I would normally do so.
 	if len(results) == 0 {
 		api.writeJsonResponse(w, results, http.StatusNotFound)
 		return
 	}
+	*/
 
 	api.writeJsonResponse(w, results, http.StatusOK)
 }

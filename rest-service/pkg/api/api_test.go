@@ -68,7 +68,8 @@ func TestAPI_SearchPeople(t *testing.T) {
 		err := json.NewDecoder(w.Result().Body).Decode(&result)
 		_ = w.Result().Body.Close()
 
-		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		// Switch to StatusNotFound if uncommenting the 404 response in the API
+		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 		assert.Nil(t, err)
 		assert.Len(t, result, 0)
 	})
@@ -81,7 +82,8 @@ func TestAPI_SearchPeople(t *testing.T) {
 		err := json.NewDecoder(w.Result().Body).Decode(&result)
 		_ = w.Result().Body.Close()
 
-		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		// Switch to StatusNotFound if uncommenting the 404 response in the API
+		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 		assert.Nil(t, err)
 		assert.Len(t, result, 0)
 	})
