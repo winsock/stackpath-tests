@@ -26,7 +26,7 @@ func (api *API) SearchPeople(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	if len(results) == 0 {
-		api.writeErrorResponse(w, "No results found with the provided search parameters", http.StatusNotFound)
+		api.writeJsonResponse(w, results, http.StatusNotFound)
 		return
 	}
 
