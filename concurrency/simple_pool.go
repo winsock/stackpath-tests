@@ -43,12 +43,24 @@ func NewSimplePool(maxConcurrent int) (*SimplePool, error) {
 	return pool, nil
 }
 
-func (p *SimplePool) Submit(runnable Runnable) {
-	p.taskChan <- runnable
+func (p *SimplePool) Submit(task Runnable) {
+	if task == nil {
+		// Would normally return as an error, but the interface spec does not allow for this
+		log.Println("Invalid nil task submitted")
+		return
+	}
+
+	p.taskChan <- task
+}
+
+func (p *SimplePool) Close() {
+	close(p.taskChan)
 }
 
 func (p *SimplePool) run() {
 	for task := range p.taskChan {
-		task()
+		if task != nil {
+			task()
+		}
 	}
 }
