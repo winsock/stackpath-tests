@@ -13,9 +13,9 @@ func TestSimplePool(t *testing.T) {
 		var waitGroup sync.WaitGroup
 
 		pool, err := NewSimplePool(1)
-		defer pool.Close()
 		assert.Nil(t, err)
 		assert.NotNil(t, pool)
+		defer pool.Close()
 
 		waitGroup.Add(1)
 		pool.Submit(func() {
@@ -29,9 +29,9 @@ func TestSimplePool(t *testing.T) {
 		var waitGroup sync.WaitGroup
 
 		pool, err := NewSimplePool(1)
-		defer pool.Close()
 		assert.Nil(t, err)
 		assert.NotNil(t, pool)
+		defer pool.Close()
 
 		waitGroup.Add(2)
 		pool.Submit(func() {
@@ -50,9 +50,9 @@ func TestSimplePool(t *testing.T) {
 		var waitGroup sync.WaitGroup
 
 		pool, err := NewSimplePool(2)
-		defer pool.Close()
 		assert.Nil(t, err)
 		assert.NotNil(t, pool)
+		defer pool.Close()
 
 		waitGroup.Add(2)
 		pool.Submit(func() {
