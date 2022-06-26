@@ -17,8 +17,9 @@ var (
 func main() {
 	flag.Parse()
 
-	fmt.Println("SP// Backend Developer Test - Input Processing")
-	fmt.Println()
+	fmt.Fprintln(os.Stderr, "SP// Backend Developer Test - Input Processing")
+	fmt.Fprintln(os.Stderr, "Standard error will contain the logging of this tool, standard out will only contain the filtered input")
+	fmt.Fprintln(os.Stderr)
 
 	// Handle the special case for no filter simply
 	if len(filterTerm) == 0 {
