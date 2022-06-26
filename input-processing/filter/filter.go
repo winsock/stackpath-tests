@@ -3,6 +3,7 @@ package filter
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -34,15 +35,13 @@ func (f *Filter) Process(dest io.Writer, source io.Reader) error {
 		sizeRead, err := f.readBuffer(source)
 		for _, b := range f.buffer[:sizeRead] {
 			if err := f.inProgressLine.WriteByte(b); err != nil {
-				// TODO: Wrap error
-				return err
+				return fmt.Errorf("error writting to in progress line buffer, %w", err)
 			}
 
 			if b == '\n' {
 				if f.matchedLine {
 					if _, err := f.inProgressLine.WriteTo(dest); err != nil {
-						// TODO Wrap error
-						return err
+						return fmt.Errorf("error writting to destination, %w", err)
 					}
 				}
 				f.Reset()
@@ -64,12 +63,11 @@ func (f *Filter) Process(dest io.Writer, source io.Reader) error {
 			}
 		}
 
-		// TODO Wrap error
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				return nil
 			}
-			return err
+			return fmt.Errorf("error while reading byte from source, %w", err)
 		}
 	}
 }
