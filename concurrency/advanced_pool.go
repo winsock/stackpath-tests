@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"sync"
-	"sync/atomic"
 )
 
 type RunnableContext func(context.Context)
@@ -36,11 +35,12 @@ type CancelablePool interface {
 // submission and closing the pool. All functions are safe to call from multiple
 // goroutines.
 type AdvancedPool struct {
-	ctx      context.Context
-	cancel   context.CancelFunc
-	taskChan chan RunnableContext
-	runners  sync.WaitGroup
-	open     atomic.Value
+	ctx       context.Context
+	cancel    context.CancelFunc
+	taskChan  chan RunnableContext
+	runners   sync.WaitGroup
+	closeChan chan struct{}
+	closeOnce sync.Once
 }
 
 // NewAdvancedPool creates a new AdvancedPool. maxSlots is the maximum total
@@ -62,9 +62,10 @@ func NewAdvancedPoolContext(parentCtx context.Context, maxSlots, maxConcurrent i
 
 	ctx, cancel := context.WithCancel(parentCtx)
 	pool := &AdvancedPool{
-		ctx:      ctx,
-		cancel:   cancel,
-		taskChan: make(chan RunnableContext, maxSlots),
+		ctx:       ctx,
+		cancel:    cancel,
+		taskChan:  make(chan RunnableContext, maxSlots),
+		closeChan: make(chan struct{}),
 	}
 
 	pool.runners.Add(maxConcurrent)
@@ -72,7 +73,6 @@ func NewAdvancedPoolContext(parentCtx context.Context, maxSlots, maxConcurrent i
 		log.Printf("Starting pool runner %d\n", i)
 		go pool.run()
 	}
-	pool.open.Store(true)
 
 	return pool, nil
 }
@@ -81,29 +81,44 @@ func (p *AdvancedPool) Submit(ctx context.Context, task RunnableContext) error {
 	if task == nil {
 		return errors.New("invalid nil task submitted")
 	}
+	if !p.IsOpen() {
+		return ErrPoolClosed
+	}
 
 	select {
 	case p.taskChan <- task:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
+	case <-p.closeChan:
+		return ErrPoolClosed
 	case <-p.ctx.Done():
 		return ErrPoolClosed
 	}
 }
 
 func (p *AdvancedPool) IsOpen() bool {
-	return p.open.Load().(bool)
+	select {
+	case <-p.closeChan:
+		return false
+	default:
+		return true
+	}
 }
 
 func (p *AdvancedPool) Close(ctx context.Context) error {
-	if !p.open.CompareAndSwap(true, false) {
+	if !p.IsOpen() {
 		return ErrPoolClosed
 	}
 
-	// Cancel our context and close our task submission channel
-	p.cancel()
-	close(p.taskChan)
+	p.closeOnce.Do(func() {
+		// Signal any pending submissions that we are closing
+		close(p.closeChan)
+		// Close our task submission channel and allow it to drain
+		close(p.taskChan)
+	})
+	// Wait to canceling the context until the end, this allows buffered tasks to finish executing
+	defer p.cancel()
 
 	c := make(chan struct{})
 	go func() {
@@ -121,21 +136,18 @@ func (p *AdvancedPool) Close(ctx context.Context) error {
 }
 
 func (p *AdvancedPool) run() {
-	defer p.runners.Done()
-	for {
-		select {
-		case task, ok := <-p.taskChan:
-			if !ok {
-				// Closed channel
-				return
-			}
-			// We got a task run it if not nil
-			if task != nil {
-				task(p.ctx)
-			}
-		case <-p.ctx.Done():
-			// Our context has been canceled, stop the runner
+	defer func() {
+		p.runners.Done()
+		log.Println("Runner is stopped")
+	}()
+	for task := range p.taskChan {
+		if p.ctx.Err() != nil {
+			// We reached the deadline on draining tasks if the channel has been closed
 			return
+		}
+		// We got a task run it if not nil
+		if task != nil {
+			task(p.ctx)
 		}
 	}
 }
