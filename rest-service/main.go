@@ -20,8 +20,8 @@ func main() {
 	restAPI := api.New()
 
 	router := httprouter.New()
-	router.GET("/people", restAPI.SearchPeople)
-	router.GET("/people/:id", restAPI.GetPerson)
+	router.GET("/people", restAPI.RequestLogger(restAPI.SearchPeople))
+	router.GET("/people/:id", restAPI.RequestLogger(restAPI.GetPerson))
 
 	log.Fatalln(http.ListenAndServe(listenAddr, router))
 }

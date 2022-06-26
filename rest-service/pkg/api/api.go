@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"github.com/stackpath/backend-developer-tests/rest-service/pkg/models"
 	"log"
 	"net/http"
@@ -13,6 +14,13 @@ type API struct {
 
 func New() *API {
 	return &API{}
+}
+
+func (_ *API) RequestLogger(handler httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		log.Printf("[%s] %s: %s\n", r.RemoteAddr, r.Method, r.URL)
+		handler(w, r, ps)
+	}
 }
 
 // writeJsonResponse Writes a JSON response with the specified status code
