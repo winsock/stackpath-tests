@@ -39,12 +39,9 @@ func (f *Filter) Process(dest io.Writer, source io.Reader) error {
 			}
 
 			if b == '\n' {
-				if f.matchedLine {
-					if _, err := f.inProgressLine.WriteTo(dest); err != nil {
-						return fmt.Errorf("error writting to destination, %w", err)
-					}
+				if err := f.writeLineIfNeeded(dest); err != nil {
+					return err
 				}
-				f.Reset()
 				continue
 			}
 
@@ -64,6 +61,11 @@ func (f *Filter) Process(dest io.Writer, source io.Reader) error {
 		}
 
 		if err != nil {
+			// If we reach EOF before a newline, write to output if we have already matched.
+			if err := f.writeLineIfNeeded(dest); err != nil {
+				return err
+			}
+
 			if errors.Is(err, io.EOF) {
 				return nil
 			}
@@ -76,6 +78,17 @@ func (f *Filter) Reset() {
 	f.inProgressLine.Reset()
 	f.possibleMatchPosition = 0
 	f.matchedLine = false
+}
+
+func (f *Filter) writeLineIfNeeded(dest io.Writer) error {
+	defer f.Reset()
+	if !f.matchedLine {
+		return nil
+	}
+	if _, err := f.inProgressLine.WriteTo(dest); err != nil {
+		return fmt.Errorf("error writting to destination, %w", err)
+	}
+	return nil
 }
 
 func (f *Filter) readBuffer(reader io.Reader) (int, error) {
