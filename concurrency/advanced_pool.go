@@ -5,14 +5,13 @@ import (
 	"errors"
 )
 
+type RunnableContext func(context.Context)
+
 // ErrPoolClosed is returned from AdvancedPool.Submit when the pool is closed
 // before submission can be sent.
 var ErrPoolClosed = errors.New("pool closed")
 
-// AdvancedPool is a more advanced worker pool that supports cancelling the
-// submission and closing the pool. All functions are safe to call from multiple
-// goroutines.
-type AdvancedPool interface {
+type CancelablePool interface {
 	// Submit submits the given task to the pool, blocking until a slot becomes
 	// available or the context is closed. The given context and its lifetime only
 	// affects this function and is not the context passed to the callback. If the
@@ -28,6 +27,12 @@ type AdvancedPool interface {
 	// If the given context is closed before all tasks have finished, the context
 	// error is returned. Otherwise, no error is returned.
 	Close(context.Context) error
+}
+
+// AdvancedPool is a more advanced worker pool that supports cancelling the
+// submission and closing the pool. All functions are safe to call from multiple
+// goroutines.
+type AdvancedPool struct {
 }
 
 // NewAdvancedPool creates a new AdvancedPool. maxSlots is the maximum total
