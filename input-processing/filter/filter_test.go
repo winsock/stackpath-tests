@@ -10,7 +10,7 @@ import (
 )
 
 func TestFilter_Process(t *testing.T) {
-	filter := New("error", 4096)
+	filter := New("-error", 4096)
 	t.Run("No Match", func(t *testing.T) {
 		source := bytes.NewReader([]byte("hello world"))
 		var dest bytes.Buffer
@@ -20,36 +20,36 @@ func TestFilter_Process(t *testing.T) {
 		assert.Equal(t, 0, dest.Len())
 	})
 	t.Run("Match", func(t *testing.T) {
-		source := bytes.NewReader([]byte("error: hello world"))
+		source := bytes.NewReader([]byte("-error: hello world"))
 		var dest bytes.Buffer
 		err := filter.Process(&dest, source)
 
 		assert.Nil(t, err)
-		assert.Equal(t, "error: hello world", dest.String())
+		assert.Equal(t, "-error: hello world", dest.String())
 	})
 	t.Run("Match Second Line", func(t *testing.T) {
-		source := bytes.NewReader([]byte("not a match\nerror: hello"))
+		source := bytes.NewReader([]byte("not a match\n-error: hello"))
 		var dest bytes.Buffer
 		err := filter.Process(&dest, source)
 
 		assert.Nil(t, err)
-		assert.Equal(t, "error: hello", dest.String())
+		assert.Equal(t, "-error: hello", dest.String())
 	})
 	t.Run("First Line Only Matches", func(t *testing.T) {
-		source := bytes.NewReader([]byte("error a match\nhello!\n"))
+		source := bytes.NewReader([]byte("-error a match\nhello!\n"))
 		var dest bytes.Buffer
 		err := filter.Process(&dest, source)
 
 		assert.Nil(t, err)
-		assert.Equal(t, "error a match\n", dest.String())
+		assert.Equal(t, "-error a match\n", dest.String())
 	})
 	t.Run("Multiple Matches", func(t *testing.T) {
-		source := bytes.NewReader([]byte("error a match\nhello error!\n"))
+		source := bytes.NewReader([]byte("-error a match\nhello -error!\n"))
 		var dest bytes.Buffer
 		err := filter.Process(&dest, source)
 
 		assert.Nil(t, err)
-		assert.Equal(t, "error a match\nhello error!\n", dest.String())
+		assert.Equal(t, "-error a match\nhello -error!\n", dest.String())
 	})
 	t.Run("Large Random Data", func(t *testing.T) {
 		randomData := make([]byte, 100000000) // 100MB
@@ -78,7 +78,7 @@ func TestFilter_Process(t *testing.T) {
 		randomData := make([]byte, 100000000) // 100MB
 		_, _ = rand.Read(randomData)
 		// Base64 encoded to ensure no random newlines were added
-		randomData = []byte(base64.StdEncoding.EncodeToString(randomData) + "error")
+		randomData = []byte(base64.StdEncoding.EncodeToString(randomData) + "-error")
 		source := bytes.NewReader(randomData)
 		var dest bytes.Buffer
 		err := filter.Process(&dest, source)
@@ -87,7 +87,7 @@ func TestFilter_Process(t *testing.T) {
 		assert.Equal(t, len(randomData), dest.Len())
 	})
 	t.Run("Error Writing to Output", func(t *testing.T) {
-		source := bytes.NewReader([]byte("error: hello world"))
+		source := bytes.NewReader([]byte("-error: hello world"))
 		err := filter.Process(&ErrorReaderWriter{}, source)
 
 		assert.NotNil(t, err)
