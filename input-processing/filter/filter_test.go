@@ -51,6 +51,17 @@ func TestFilter_Process(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "error a match\nhello error!\n", dest.String())
 	})
+	t.Run("Large Random Data", func(t *testing.T) {
+		randomData := make([]byte, 100000000) // 100MB
+		_, _ = rand.Read(randomData)
+		// The random data could contain newlines
+		source := bytes.NewReader(randomData)
+		var dest bytes.Buffer
+		err := filter.Process(&dest, source)
+
+		assert.Nil(t, err)
+		assert.Equal(t, 0, dest.Len())
+	})
 	t.Run("Large Single Line not Matching", func(t *testing.T) {
 		randomData := make([]byte, 100000000) // 100MB
 		_, _ = rand.Read(randomData)
